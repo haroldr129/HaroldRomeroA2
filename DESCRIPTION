@@ -1,0 +1,18 @@
+Package: HaroldRomeroA2
+Type: Package
+Title: kNN, Linear regression, and multilinear regression
+Version: 0.1.0
+Author: person ("Harold", "Romero", email= "haroldr129@gmail.com", role=c("aut","cre"))
+Maintainer: <haroldr129@gmail.com>
+Description: En el presente proyecto se pretende resolver Supervised Methods in Machine Learning
+              donde se realizara una exploración de los datos, metodo KNN, regresion lineal y
+              regresion multilinear
+              Libreria caret y tidyverse
+License: use_mit_license()
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    dplyr
+    tidyr
+    caret
+    tidyverse
