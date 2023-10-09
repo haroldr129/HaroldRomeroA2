@@ -12,7 +12,11 @@ License: use_mit_license()
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    dplyr
-    tidyr
-    caret
     tidyverse
+    caret
+    class
+    gmodels
+    psych
+    dplyr
+    rpart
+

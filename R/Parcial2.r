@@ -4,6 +4,7 @@ library(class)
 library(gmodels)
 library(psych)
 library(dplyr)
+library(rpart)
 
 ###### Cargar el dataset en R
 
@@ -64,7 +65,8 @@ Datos_Primer_Modelo <- diabetes_012 %>%
 summary(Datos_Primer_Modelo)
 
 # Crear un modelo de árbol de decisión para determinar los datos mas relevantes
-modelo_arbol <- rpart(Diabetes_012 ~ ., data = Datos_Primer_Modelo)
+modelo_arbol <- rpart(Diabetes_012 ~ .
+                      , data = Datos_Primer_Modelo)
 
 # Calcular la importancia de las características
 importancia_caracteristicas <- modelo_arbol$variable.importance
@@ -81,9 +83,14 @@ predictors <-
   colnames(Datos_Primer_Modelo)[-1]
 
 train.data1 <-
-  Datos_Primer_Modelo[sample.index1, c(predictors, "Diabetes_012"), drop = FALSE] #cuales de las muestras fueron seleccionadas para el entrenamiento
+  Datos_Primer_Modelo[sample.index1
+                      , c(predictors, "Diabetes_012")
+                      , drop = FALSE] #cuales de las muestras fueron seleccionadas para el entrenamiento
 test.data1 <-
-  Datos_Primer_Modelo[-sample.index1, c(predictors, "Diabetes_012"), drop = FALSE] #Cuales de las muestras fueron seleccionadas para test
+  Datos_Primer_Modelo[-sample.index1
+                      , c(predictors
+                          , "Diabetes_012")
+                      , drop = FALSE] #Cuales de las muestras fueron seleccionadas para test
 
 ####KNN
 
@@ -92,7 +99,8 @@ train.data1$Diabetes_012 <-
 test.data1$Diabetes_012 <-
   factor(test.data1$Diabetes_012)
 
-ctrl1 <- trainControl(method = "cv", p = 0.7, number = 10) #Control del entrenamiento
+ctrl1 <- trainControl(method = "cv"
+                      , p = 0.7, number = 10) #Control del entrenamiento
 knnFit1 <- train(Diabetes_012 ~ .
                 , data = train.data1
                 , method = "knn", trControl = ctrl1
@@ -114,11 +122,18 @@ confusionMatrix(data = knnPredict1,
 
 
 #Remover 5 predictors
-Ret_5_Predicts1 <- c("Smoker", "MentHlth", "AnyHealthcare", "NoDocbcCost", "Veggies")
+Ret_5_Predicts1 <- c("Smoker"
+                     , "MentHlth"
+                     , "AnyHealthcare"
+                     , "NoDocbcCost"
+                     , "Veggies")
+
 train.data1_1 <- train.data1[, !(names(train.data1) %in% Ret_5_Predicts1)]
 test.data1_1 <- test.data1[, !(names(test.data1) %in% Ret_5_Predicts1)]
 
-ctrl1_1 <- trainControl(method = "cv",p = 0.7, number = 5)
+ctrl1_1 <- trainControl(method = "cv"
+                        ,p = 0.7, number = 5)
+
 knnFit1_1 <- train(Diabetes_012 ~ .
                  , data = train.data1_1
                  , method = "knn", trControl = ctrl1_1
@@ -128,16 +143,24 @@ knnFit1_1 <- train(Diabetes_012 ~ .
 knnFit1_1
 plot(knnFit1_1)
 
-knnPredict1_1 <- predict(knnFit1_1, newdata = test.data1_1)
+knnPredict1_1 <- predict(knnFit1_1
+                         , newdata = test.data1_1)
 
-confusionMatrix(data = knnPredict1_1, reference = test.data1_1$Diabetes_012)
+confusionMatrix(data = knnPredict1_1
+                , reference = test.data1_1$Diabetes_012)
 
 #Remover 5 predictores mas
-Ret_5_Predicts1_1 <- c("HvyAlcoholConsump", "Fruits","Sex", "Stroke", "CholCheck")
+Ret_5_Predicts1_1 <- c("HvyAlcoholConsump"
+                       ,"Fruits"
+                       ,"Sex"
+                       ,"Stroke"
+                       ,"CholCheck")
+
 train.data1_2 <- train.data1_1[, !(names(train.data1_1) %in% Ret_5_Predicts1_1)]
 test.data1_2 <- test.data1_1[, !(names(test.data1_1) %in% Ret_5_Predicts1_1)]
 
-ctrl1_2 <- trainControl(method = "repeatedcv", p = 0.7, number = 10, repeats = 3)
+ctrl1_2 <- trainControl(method = "repeatedcv"
+                        , p = 0.7, number = 10, repeats = 3)
 knnFit1_2 <- train(Diabetes_012 ~ .
                  , data = train.data1_2
                  , method = "knn", trControl = ctrl1_2
@@ -148,10 +171,12 @@ knnFit1_2
 plot(knnFit1_2)
 
 # Make predictions
-knnPredict1_2 <- predict(knnFit1_2, newdata = test.data1_2)
+knnPredict1_2 <- predict(knnFit1_2
+                         , newdata = test.data1_2)
 
 # Creates the confusion matrix
-confusionMatrix(data = knnPredict1_2, reference = test.data1_2$Diabetes_012)
+confusionMatrix(data = knnPredict1_2
+                , reference = test.data1_2$Diabetes_012)
 
 ###muestra estratificada del 1% de la población, variable clase HeartDiseaseorAttack
 ###### Segundo Modelo
@@ -166,7 +191,8 @@ sample.index2 <- sample(1:nrow(Datos_Segundo_Modelo)
                        ,replace = F)
 
 # Crear un modelo de árbol de decisión para determinar los datos mas relevantes
-modelo_arbol1 <- rpart(HeartDiseaseorAttack ~ ., data = Datos_Segundo_Modelo)
+modelo_arbol1 <- rpart(HeartDiseaseorAttack ~ .
+                       , data = Datos_Segundo_Modelo)
 
 # Calcular la importancia de las características
 importancia_caracteristicas1 <- modelo_arbol1$variable.importance
@@ -182,7 +208,8 @@ test.data2 <- Datos_Segundo_Modelo[-sample.index2, c(predictors2, "HeartDiseaseo
 train.data2$HeartDiseaseorAttack <- factor(train.data2$HeartDiseaseorAttack)
 test.data2$HeartDiseaseorAttack <- factor(test.data2$HeartDiseaseorAttack)
 
-ctrl2 <- trainControl(method = "cv", p = 0.7, number=10)
+ctrl2 <- trainControl(method = "cv"
+                      , p = 0.7, number=10)
 knnFit2 <- train(HeartDiseaseorAttack ~ .
                  , data = train.data2
                  , method = "knn", trControl = ctrl2
@@ -193,10 +220,12 @@ knnFit2
 plot(knnFit2)
 
 # Make predictions
-knnPredict2 <- predict(knnFit2, newdata = test.data2)
+knnPredict2 <- predict(knnFit2
+                       , newdata = test.data2)
 
 # Creates the confusion matrix
-confusionMatrix(data = knnPredict2, reference = test.data2$HeartDiseaseorAttack)
+confusionMatrix(data = knnPredict2
+                , reference = test.data2$HeartDiseaseorAttack)
 
 #Remover 5 predictors
 Ret_5_Predicts2 <- c("Sex", "HvyAlcoholConsump", "Fruits", "NoDocbcCost", "Veggies")
@@ -212,16 +241,27 @@ knnFit2_1 <- train(HeartDiseaseorAttack ~ .
 knnFit2_1
 plot(knnFit2_1)
 
-knnPredict2_1 <- predict(knnFit2_1, newdata = test.data2_1)
+knnPredict2_1 <- predict(knnFit2_1
+                         newdata = test.data2_1)
 
-confusionMatrix(data = knnPredict2_1, reference = test.data2_1$HeartDiseaseorAttack)
+confusionMatrix(data = knnPredict2_1
+                , reference = test.data2_1$HeartDiseaseorAttack)
 
 #Remover 5 predictores mas
-Ret_5_Predicts2_1 <- c("PhysActivity", "Diabetes_012","CholCheck", "AnyHealthcare", "Stroke")
+Ret_5_Predicts2_1 <- c("PhysActivity"
+                       ,"Diabetes_012"
+                       ,"CholCheck"
+                       ,"AnyHealthcare"
+                       ,"Stroke")
+
 train.data2_2 <- train.data2_1[, !(names(train.data2_1) %in% Ret_5_Predicts2_1)]
 test.data2_2 <- test.data2_1[, !(names(test.data2_1) %in% Ret_5_Predicts2_1)]
 
-ctrl2_2 <- trainControl(method = "repeatedcv", p = 0.7, number = 10, repeats = 3)
+ctrl2_2 <- trainControl(method = "repeatedcv"
+                        , p = 0.7
+                        , number = 10
+                        , repeats = 3)
+
 knnFit2_2 <- train(HeartDiseaseorAttack ~ .
                    , data = train.data2_2
                    , method = "knn", trControl = ctrl2_2
@@ -230,9 +270,11 @@ knnFit2_2 <- train(HeartDiseaseorAttack ~ .
 knnFit2_2
 plot(knnFit2_2)
 
-knnPredict2_2 <- predict(knnFit2_2, newdata = test.data2_2)
+knnPredict2_2 <- predict(knnFit2_2
+                         , newdata = test.data2_2)
 
-confusionMatrix(data = knnPredict2_2, reference = test.data2_2$HeartDiseaseorAttack)
+confusionMatrix(data = knnPredict2_2
+                , reference = test.data2_2$HeartDiseaseorAttack)
 
 ###muestra estratificada del 1% de la población, variable clase Sex
 ###### Tercer Modelo
@@ -247,7 +289,8 @@ sample.index3 <- sample(1:nrow(Datos_Tercer_Modelo)
                        ,replace = F)
 
 # Crear un modelo de árbol de decisión para determinar los datos mas relevantes
-modelo_arbol2 <- rpart(Sex ~ ., data = Datos_Tercer_Modelo)
+modelo_arbol2 <- rpart(Sex ~ .
+                       , data = Datos_Tercer_Modelo)
 
 # Calcular la importancia de las características
 importancia_caracteristicas2 <- modelo_arbol2$variable.importance
@@ -263,7 +306,10 @@ test.data3 <- Datos_Tercer_Modelo[-sample.index3, c(predictors3, "Sex"), drop = 
 train.data3$Sex <- factor(train.data3$Sex)
 test.data3$Sex <- factor(test.data3$Sex)
 
-ctrl3 <- trainControl(method = "cv", p = 0.7, number = 10)
+ctrl3 <- trainControl(method = "cv"
+                      , p = 0.7
+                      , number = 10)
+
 knnFit3 <- train(Sex ~ .
                  , data = train.data3
                  , method = "knn", trControl = ctrl3
@@ -273,16 +319,24 @@ knnFit3 <- train(Sex ~ .
 knnFit3
 plot(knnFit3)
 
-knnPredict3 <- predict(knnFit3, newdata = test.data3)
+knnPredict3 <- predict(knnFit3
+                       , newdata = test.data3)
 
-confusionMatrix(data = knnPredict3, reference = test.data3$Sex)
+confusionMatrix(data = knnPredict3
+                , reference = test.data3$Sex)
 
 #Remover 5 predictors
-Ret_5_Predicts3 <- c("Stroke", "CholCheck", "AnyHealthcare", "NoDocbcCost", "Smoker")
+Ret_5_Predicts3 <- c("Stroke"
+                     , "CholCheck"
+                     , "AnyHealthcare"
+                     , "NoDocbcCost"
+                     , "Smoker")
+
 train.data3_1 <- train.data3[, !(names(train.data3) %in% Ret_5_Predicts3)]
 test.data3_1 <- test.data3[, !(names(test.data3) %in% Ret_5_Predicts3)]
 
-ctrl3_1 <- trainControl(method = "cv",p = 0.7, number = 5)
+ctrl3_1 <- trainControl(method = "cv"
+                        ,p = 0.7, number = 5)
 knnFit3_1 <- train(Sex ~ .
                    , data = train.data3_1
                    , method = "knn", trControl = ctrl3_1
@@ -292,28 +346,39 @@ knnFit3_1 <- train(Sex ~ .
 knnFit3_1
 plot(knnFit3_1)
 
-knnPredict3_1 <- predict(knnFit3_1, newdata = test.data3_1)
+knnPredict3_1 <- predict(knnFit3_1
+                         , newdata = test.data3_1)
 
-confusionMatrix(data = knnPredict3_1, reference = test.data3_1$Sex)
+confusionMatrix(data = knnPredict3_1
+                , reference = test.data3_1$Sex)
 
 #Remover 5 predictores mas
-Ret_5_Predicts3_1 <- c("Diabetes_012", "HighBP","HighChol", "HeartDiseaseorAttack", "MentHlth")
+Ret_5_Predicts3_1 <- c("Diabetes_012"
+                       ,"HighBP"
+                       ,"HighChol"
+                       ,"HeartDiseaseorAttack"
+                       , "MentHlth")
+
 train.data3_2 <- train.data3_1[, !(names(train.data3_1) %in% Ret_5_Predicts3_1)]
 test.data3_2 <- test.data3_1[, !(names(test.data3_1) %in% Ret_5_Predicts3_1)]
 
-ctrl3_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+ctrl3_2 <- trainControl(method = "repeatedcv"
+                        , number = 10, repeats = 3)
 knnFit3_2 <- train(Sex ~ .
                    , data = train.data3_2
-                   , method = "knn", trControl = ctrl3_2
+                   , method = "knn"
+                   , trControl = ctrl3_2
                    , preProcess = c("center", "scale") # for z-score
                    , tuneLength = 30)
 knnFit3_2
 plot(knnFit3_2)
 
 
-knnPredict3_2 <- predict(knnFit3_2, newdata = test.data3_2)
+knnPredict3_2 <- predict(knnFit3_2
+                         , newdata = test.data3_2)
 
-confusionMatrix(data = knnPredict3_2, reference = test.data3_2$Sex)
+confusionMatrix(data = knnPredict3_2
+                , reference = test.data3_2$Sex)
 
 
 ########### TERCER PUNTO Y ULTIMO :)
@@ -323,15 +388,21 @@ Predictors_Punto3 <- colnames(muestra)[-5]
 sample.index_1 <- sample(1:nrow(muestra)
                        ,nrow(muestra)*0.7
                        ,replace = F)
+
 train.data_Punto3 <- muestra[sample.index_1,c(Predictors_Punto3,"BMI"),drop=F]
 test.data_Punto3 <- muestra[-sample.index_1,c(Predictors_Punto3,"BMI"),drop=F]
-ins_model <- lm(BMI ~ ., data = train.data_Punto3)
+ins_model <- lm(BMI ~ .
+                , data = train.data_Punto3)
 ins_model
 summary(ins_model)
 
-train.control_Punto3 <- trainControl(method = "cv", p = 0.7, number = 10 )
-model_Punto3 <- train(BMI ~ ., data = train.data_Punto3, method = "lm",
-               trControl = train.control_Punto3)
+train.control_Punto3 <- trainControl(method = "cv"
+                                     , p = 0.7
+                                     , number = 10 )
+
+model_Punto3 <- train(BMI ~ ., data = train.data_Punto3
+                      , method = "lm"
+                      , trControl = train.control_Punto3)
 
 print(model_Punto3)
 
@@ -444,6 +515,6 @@ model_Rl_2 <- train(MentHlth ~ ., data = train.data_Rl_2, method = "lm",
 print(model_Rl_2)
 
 
-library(rpart)
+
 
 
