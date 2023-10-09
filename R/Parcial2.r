@@ -241,7 +241,7 @@ knnFit2_1 <- train(HeartDiseaseorAttack ~ .
 knnFit2_1
 plot(knnFit2_1)
 
-knnPredict2_1 <- predict(knnFit2_1
+knnPredict2_1 <- predict(knnFit2_1,
                          newdata = test.data2_1)
 
 confusionMatrix(data = knnPredict2_1
@@ -452,12 +452,13 @@ summary(ins_model3)
 
 # Entrenar el modelo
 train.control_Punto3_2 <- trainControl(method = "repeatedcv", p = 0.7, number = 3, repeats = 10)
-model_Punto3_2 <- train(BMI ~ ., data = train.data_Punto3_2, method = "lm",
+model_Punto3_2 <- train(BMI ~ HighBP
+                        ,data = train.data_Punto3_2
+                        , method = "lm",
                trControl = train.control_Punto3_2)
 
-# Summarize the results
 print(model_Punto3_2)
-
+summary (model_Punto3_2)
 
 ### Regresion linear
 
@@ -481,9 +482,13 @@ model_Rl <- train(MentHlth ~ ., data = train.data_Rl, method = "lm",
 
 print(model_Rl)
 
-###Second, se retiran las variables que no aportan al modelo
+###se retiran las variables que no aportan al modelo
 
-Pred_Remov__Rl <- c("Fruits", "BMI", "HeartDiseaseorAttack", "Veggies", "HvyAlcoholConsump")
+Pred_Remov__Rl <- c("Fruits"
+                    , "BMI"
+                    , "HeartDiseaseorAttack"
+                    , "Veggies"
+                    , "HvyAlcoholConsump")
 
 train.data_Rl_1 <- train.data_Rl[, !(names(train.data_Rl) %in% Pred_Remov__Rl)]
 test.data_Rl_1 <- test.data_Rl[, !(names(test.data_Rl) %in% Pred_Remov__Rl)]
@@ -499,8 +504,12 @@ model_Rl_1 <- train(MentHlth ~ ., data = train.data_Rl_1, method = "lm",
 
 print(model_Rl_1)
 
-#### Third Se retiran las variables que no aportan al modelo
-Pred_Remov__Rl_1 <- c("CholCheck", "HighBP", "PhysActivity", "AnyHealtcare", "Education")
+#### Se retiran las variables que no aportan al modelo
+Pred_Remov__Rl_1 <- c("CholCheck"
+                      ,"HighBP"
+                      ,"PhysActivity"
+                      ,"AnyHealtcare"
+                      ,"Education")
 
 train.data_Rl_2 <- train.data_Rl_1[, !(names(train.data_Rl_1) %in% Pred_Remov__Rl_1)]
 test.data_Rl_2 <- test.data_Rl_1[, !(names(test.data_Rl_1) %in% Pred_Remov__Rl_1)]
