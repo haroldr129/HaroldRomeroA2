@@ -80,7 +80,6 @@ knnFit1 <- train(Diabetes_012 ~ .
                 , preProcess = c("range") # c("center", "scale") for z-score
                 , tuneLength = 50)
 
-plot(knnFit1)
 
 # Make predictions
 knnPredict1 <- predict(knnFit1, newdata = test.data1)
@@ -88,6 +87,44 @@ knnPredict1 <- predict(knnFit1, newdata = test.data1)
 # Creates the confusion matrix
 confusionMatrix(data = knnPredict1, reference = test.data1$Diabetes_012)
 
+
+#Remover 5 predictors
+Ret_5_Predicts1 <- c("Smoker", "PhysActivity ", "AnyHealthcare", "NoDocbcCost", "Education")
+train.data1_1 <- train.data1[, !(names(train.data1) %in% Ret_5_Predicts1)]
+test.data1_1 <- test.data1[, !(names(test.data1) %in% Ret_5_Predicts1)]
+
+ctrl1_1 <- trainControl(method = "cv", number = 5)
+knnFit1_1 <- train(Diabetes_012 ~ .
+                 , data = train.data1_1
+                 , method = "knn", trControl = ctrl1_1
+                 , preProcess = c("range") # c("center", "scale") for z-score
+                 , tuneLength = 20)
+
+plot(knnFit1_1)
+
+knnPredict1_1 <- predict(knnFit1_1, newdata = test.data1_1)
+
+confusionMatrix(data = knnPredict1_1, reference = test.data1_1$Diabetes_012)
+
+#Remover 5 predictores mas
+Ret_5_Predicts1_1 <- c("HeartDiseaseorAttack ", "MentHlth","PhysHlth", "Veggies", "Income")
+train.data1_2 <- train.data1_1[, !(names(train.data1_1) %in% Ret_5_Predicts1_1)]
+test.data1_2 <- test.data1_1[, !(names(test.data1_1) %in% Ret_5_Predicts1_1)]
+
+ctrl1_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+knnFit1_2 <- train(Diabetes_012 ~ .
+                 , data = train.data1_2
+                 , method = "knn", trControl = ctrl1_2
+                 , preProcess = c("range") # c("center", "scale") for z-score
+                 , tuneLength = 20)
+
+plot(knnFit1_2)
+
+# Make predictions
+knnPredict1_2 <- predict(knnFit1_2, newdata = test.data1_2)
+
+# Creates the confusion matrix
+confusionMatrix(data = knnPredict1_2, reference = test.data1_2$Diabetes_012)
 
 ###muestra estratificada del 1% de la población, variable clase HeartDiseaseorAttack
 ###### Segundo Modelo
@@ -103,6 +140,64 @@ sample.index2 <- sample(1:nrow(Datos_Segundo_Modelo)
 
 predictors2 <- colnames(Datos_Segundo_Modelo)[-8]
 
+train.data2 <- Datos_Segundo_Modelo[sample.index2, c(predictors2, "HeartDiseaseorAttack"), drop = FALSE]
+test.data2 <- Datos_Segundo_Modelo[-sample.index2, c(predictors2, "HeartDiseaseorAttack"), drop = FALSE]
+
+train.data2$HeartDiseaseorAttack <- factor(train.data2$HeartDiseaseorAttack)
+test.data2$HeartDiseaseorAttack <- factor(test.data2$HeartDiseaseorAttack)
+
+ctrl2 <- trainControl(method = "cv", p = 0.7)
+knnFit2 <- train(HeartDiseaseorAttack ~ .
+                 , data = train.data2
+                 , method = "knn", trControl = ctrl2
+                 , preProcess = c("range") # c("center", "scale") for z-score
+                 , tuneLength = 50)
+
+
+# Make predictions
+knnPredict2 <- predict(knnFit2, newdata = test.data2)
+
+# Creates the confusion matrix
+confusionMatrix(data = knnPredict2, reference = test.data2$HeartDiseaseorAttack)
+
+#Remover 5 predictors
+Ret_5_Predicts2 <- c("Stroke", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "Education")
+train.data2_1 <- train.data2[, !(names(train.data2) %in% Ret_5_Predicts2)]
+test.data2_1 <- test.data2[, !(names(test.data2) %in% Ret_5_Predicts2)]
+
+ctrl2_1 <- trainControl(method = "cv", number = 5)
+knnFit2_1 <- train(HeartDiseaseorAttack ~ .
+                   , data = train.data2_1
+                   , method = "knn", trControl = ctrl2_1
+                   , preProcess = c("range") # c("center", "scale") for z-score
+                   , tuneLength = 20)
+
+plot(knnFit2_1)
+
+knnPredict2_1 <- predict(knnFit2_1, newdata = test.data2_1)
+
+confusionMatrix(data = knnPredict2_1, reference = test.data2_1$HeartDiseaseorAttack)
+
+#Remover 5 predictores mas
+Ret_5_Predicts2_1 <- c("Sex", "Fruits","CholCheck", "Veggies", "Income")
+train.data2_2 <- train.data2_1[, !(names(train.data2_1) %in% Ret_5_Predicts2_1)]
+test.data2_2 <- test.data2_1[, !(names(test.data2_1) %in% Ret_5_Predicts2_1)]
+
+ctrl2_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+knnFit2_2 <- train(HeartDiseaseorAttack ~ .
+                   , data = train.data2_2
+                   , method = "knn", trControl = ctrl2_2
+                   , preProcess = c("range") # c("center", "scale") for z-score
+                   , tuneLength = 20)
+
+plot(knnFit2_2)
+
+# Make predictions
+knnPredict2_2 <- predict(knnFit2_2, newdata = test.data2_2)
+
+# Creates the confusion matrix
+confusionMatrix(data = knnPredict2_2, reference = test.data2_2$HeartDiseaseorAttack)
+
 ###muestra estratificada del 1% de la población, variable clase Sex
 ###### Tercer Modelo
 set.seed(1)
@@ -116,5 +211,63 @@ sample.index3 <- sample(1:nrow(Datos_Tercer_Modelo)
                        ,replace = F)
 
 predictors3 <- colnames(Datos_Tercer_Modelo)[-19]
+
+train.data3 <- Datos_Tercer_Modelo[sample.index3, c(predictors3, "Sex"), drop = FALSE]
+test.data3 <- Datos_Tercer_Modelo[-sample.index3, c(predictors3, "Sex"), drop = FALSE]
+
+train.data3$Sex <- factor(train.data3$Sex)
+test.data3$Sex <- factor(test.data3$Sex)
+
+ctrl3 <- trainControl(method = "cv", p = 0.7)
+knnFit3 <- train(Sex ~ .
+                 , data = train.data3
+                 , method = "knn", trControl = ctrl3
+                 , preProcess = c("range") # c("center", "scale") for z-score
+                 , tuneLength = 50)
+
+
+# Make predictions
+knnPredict3 <- predict(knnFit3, newdata = test.data3)
+
+# Creates the confusion matrix
+confusionMatrix(data = knnPredict3, reference = test.data3$Sex)
+
+#Remover 5 predictors
+Ret_5_Predicts3 <- c("Stroke", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "Education")
+train.data3_1 <- train.data3[, !(names(train.data3) %in% Ret_5_Predicts3)]
+test.data3_1 <- test.data3[, !(names(test.data3) %in% Ret_5_Predicts3)]
+
+ctrl3_1 <- trainControl(method = "cv", number = 5)
+knnFit3_1 <- train(Sex ~ .
+                   , data = train.data3_1
+                   , method = "knn", trControl = ctrl3_1
+                   , preProcess = c("range") # c("center", "scale") for z-score
+                   , tuneLength = 20)
+
+plot(knnFit3_1)
+
+knnPredict3_1 <- predict(knnFit3_1, newdata = test.data3_1)
+
+confusionMatrix(data = knnPredict3_1, reference = test.data3_1$Sex)
+
+#Remover 5 predictores mas
+Ret_5_Predicts3_1 <- c("Age", "Fruits","CholCheck", "Veggies", "Income")
+train.data3_2 <- train.data3_1[, !(names(train.data3_1) %in% Ret_5_Predicts3_1)]
+test.data3_2 <- test.data3_1[, !(names(test.data3_1) %in% Ret_5_Predicts3_1)]
+
+ctrl3_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+knnFit3_2 <- train(Sex ~ .
+                   , data = train.data3_2
+                   , method = "knn", trControl = ctrl3_2
+                   , preProcess = c("range") # c("center", "scale") for z-score
+                   , tuneLength = 20)
+
+plot(knnFit3_2)
+
+# Make predictions
+knnPredict3_2 <- predict(knnFit3_2, newdata = test.data3_2)
+
+# Creates the confusion matrix
+confusionMatrix(data = knnPredict3_2, reference = test.data3_2$Sex)
 
 
