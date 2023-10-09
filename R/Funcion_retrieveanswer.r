@@ -17,48 +17,27 @@ retrieve_answer <- function(seleccionar)
     cat("Error: Por favor, ingrese un número entero válido.\n")
     retrieve_answer}
 
-  if (seleccionar >= 1 && seleccionar <= 6) {
+  if (seleccionar >= 1 && seleccionar <= 3) {
     cat("Has seleccionado la opción:",seleccionar, "\n")
     if (seleccionar==1)
     {
-      cat("Ejercicios 5.2", "\n")
-      source("C:\\Users\\harold.romero\\G. BARCO S.A\\Usuarios - Harold Romero\\Documentos\\Documentos\\Harold\\PERSONAL\\Universidad\\Electiva 3\\R PROYECTOS\\Classwork\\R\\Opcion1.R")
+      cat("Punto 1", "\n")
+      source("C:\\Users\\harold.romero\\G. BARCO S.A\\Usuarios - Harold Romero\\Documentos\\Documentos\\Harold\\PERSONAL\\Universidad\\Electiva 3\\R PROYECTOS\\HaroldRomeroA2\\R\\Punto1.R")
     }
     else {
       if(seleccionar==2){
-        cat("Ejercicios 5.3", "\n")
-        source("C:\\Users\\harold.romero\\G. BARCO S.A\\Usuarios - Harold Romero\\Documentos\\Documentos\\Harold\\PERSONAL\\Universidad\\Electiva 3\\R PROYECTOS\\Classwork\\R\\Opcion2.R")
+        cat("Punto 2", "\n")
+        source("C:\\Users\\harold.romero\\G. BARCO S.A\\Usuarios - Harold Romero\\Documentos\\Documentos\\Harold\\PERSONAL\\Universidad\\Electiva 3\\R PROYECTOS\\HaroldRomeroA2\\R\\Punto2.R")
       }
       else{
         if(seleccionar==3)
         {
           cat("Ejercicios 5.4", "\n")
           source("C:\\Users\\harold.romero\\G. BARCO S.A\\Usuarios - Harold Romero\\Documentos\\Documentos\\Harold\\PERSONAL\\Universidad\\Electiva 3\\R PROYECTOS\\Classwork\\R\\Opcion3.R")
-        }
-        else{
-          if(seleccionar==4)
-          { cat("Ejercicios 5.5", "\n")
-            source("C:\\Users\\harold.romero\\G. BARCO S.A\\Usuarios - Harold Romero\\Documentos\\Documentos\\Harold\\PERSONAL\\Universidad\\Electiva 3\\R PROYECTOS\\Classwork\\R\\Opcion4.R")
-          }
-          else{
-            if(seleccionar==5)
-            {cat("Ejercicios 5.6", "\n")
-              source("C:\\Users\\harold.romero\\G. BARCO S.A\\Usuarios - Harold Romero\\Documentos\\Documentos\\Harold\\PERSONAL\\Universidad\\Electiva 3\\R PROYECTOS\\Classwork\\R\\Opcion5.R")
-            }
-            else{if(seleccionar==6)
-            {cat("Ejercicios 5.7", "\n")
-              source("C:\\Users\\harold.romero\\G. BARCO S.A\\Usuarios - Harold Romero\\Documentos\\Documentos\\Harold\\PERSONAL\\Universidad\\Electiva 3\\R PROYECTOS\\Classwork\\R\\Opcion6.R")
-            }
-              else{}
-            }
-          }
-        }
-      }
-    }
-  }
+        }}}}
   else {
-    cat("Error: La opción debe estar entre 1 y 6.\n")
-    seleccionar <- as.integer(readline("Ingrese una opción entre 1 y 6: "))}
+    cat("Error: La opción debe estar entre 1 y 3.\n")
+    seleccionar <- as.integer(readline("Ingrese una opción entre 1 y 3: "))}
 }
 retrieve_answer()
 
