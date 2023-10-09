@@ -44,7 +44,7 @@ hist(muestra$MentHlth, breaks = 100, col = "purple")
 hist(muestra$PhysHlth, breaks = 100, col = "pink")
 
 #Todas nuestras variables son numericas, por lo que no se requiere ejecutar el comando as factor
-pairs.panels(muestra [c("Age", "BMI", "Education", "GenHlth")],
+pairs.panels(muestra [c("Age", "BMI", "HighChol", "GenHlth")],
              pch = 21,
              bg = c("purple", "black", "red", "orange" , "yellow")[unclass(muestra$Diabetes_012)]) # En este caso nuestra variable clase es Diabetes_012
 
@@ -59,6 +59,15 @@ Datos_Primer_Modelo <- diabetes_012 %>%
   group_by(Diabetes_012) %>%
   sample_n(1268, replace = TRUE) %>%
   ungroup()
+
+# Crear un modelo de árbol de decisión para determinar los datos mas relevantes
+modelo_arbol <- rpart(Diabetes_012 ~ ., data = Datos_Primer_Modelo)
+
+# Calcular la importancia de las características
+importancia_caracteristicas <- modelo_arbol$variable.importance
+
+# Visualizar la importancia de las características
+print(importancia_caracteristicas)
 
 sample.index1 <- sample(1:nrow(Datos_Primer_Modelo)
                        ,nrow(Datos_Primer_Modelo)*0.7
@@ -89,7 +98,7 @@ confusionMatrix(data = knnPredict1, reference = test.data1$Diabetes_012)
 
 
 #Remover 5 predictors
-Ret_5_Predicts1 <- c("Smoker", "PhysActivity ", "AnyHealthcare", "NoDocbcCost", "Education")
+Ret_5_Predicts1 <- c("Smoker", " MentHlth", "AnyHealthcare", "NoDocbcCost", "Veggies")
 train.data1_1 <- train.data1[, !(names(train.data1) %in% Ret_5_Predicts1)]
 test.data1_1 <- test.data1[, !(names(test.data1) %in% Ret_5_Predicts1)]
 
@@ -107,7 +116,7 @@ knnPredict1_1 <- predict(knnFit1_1, newdata = test.data1_1)
 confusionMatrix(data = knnPredict1_1, reference = test.data1_1$Diabetes_012)
 
 #Remover 5 predictores mas
-Ret_5_Predicts1_1 <- c("HeartDiseaseorAttack ", "MentHlth","PhysHlth", "Veggies", "Income")
+Ret_5_Predicts1_1 <- c("HvyAlcoholConsump ", "Fruits","Sex", "Stroke", "HighBP")
 train.data1_2 <- train.data1_1[, !(names(train.data1_1) %in% Ret_5_Predicts1_1)]
 test.data1_2 <- test.data1_1[, !(names(test.data1_1) %in% Ret_5_Predicts1_1)]
 
@@ -138,6 +147,15 @@ sample.index2 <- sample(1:nrow(Datos_Segundo_Modelo)
                        ,nrow(Datos_Segundo_Modelo)*0.7
                        ,replace = F)
 
+# Crear un modelo de árbol de decisión para determinar los datos mas relevantes
+modelo_arbol1 <- rpart(HeartDiseaseorAttack ~ ., data = Datos_Segundo_Modelo)
+
+# Calcular la importancia de las características
+importancia_caracteristicas1 <- modelo_arbol1$variable.importance
+
+# Visualizar la importancia de las características
+print(importancia_caracteristicas1)
+
 predictors2 <- colnames(Datos_Segundo_Modelo)[-8]
 
 train.data2 <- Datos_Segundo_Modelo[sample.index2, c(predictors2, "HeartDiseaseorAttack"), drop = FALSE]
@@ -161,7 +179,7 @@ knnPredict2 <- predict(knnFit2, newdata = test.data2)
 confusionMatrix(data = knnPredict2, reference = test.data2$HeartDiseaseorAttack)
 
 #Remover 5 predictors
-Ret_5_Predicts2 <- c("Stroke", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "Education")
+Ret_5_Predicts2 <- c("Sex", "HvyAlcoholConsump", "Fruits", "NoDocbcCost", "Veggies")
 train.data2_1 <- train.data2[, !(names(train.data2) %in% Ret_5_Predicts2)]
 test.data2_1 <- test.data2[, !(names(test.data2) %in% Ret_5_Predicts2)]
 
@@ -179,7 +197,7 @@ knnPredict2_1 <- predict(knnFit2_1, newdata = test.data2_1)
 confusionMatrix(data = knnPredict2_1, reference = test.data2_1$HeartDiseaseorAttack)
 
 #Remover 5 predictores mas
-Ret_5_Predicts2_1 <- c("Sex", "Fruits","CholCheck", "Veggies", "Income")
+Ret_5_Predicts2_1 <- c("PhysActivity", "Diabetes_012","CholCheck", "AnyHealthcare", "Stroke")
 train.data2_2 <- train.data2_1[, !(names(train.data2_1) %in% Ret_5_Predicts2_1)]
 test.data2_2 <- test.data2_1[, !(names(test.data2_1) %in% Ret_5_Predicts2_1)]
 
@@ -208,6 +226,15 @@ sample.index3 <- sample(1:nrow(Datos_Tercer_Modelo)
                        ,nrow(Datos_Tercer_Modelo)*0.7
                        ,replace = F)
 
+# Crear un modelo de árbol de decisión para determinar los datos mas relevantes
+modelo_arbol2 <- rpart(Sex ~ ., data = Datos_Tercer_Modelo)
+
+# Calcular la importancia de las características
+importancia_caracteristicas2 <- modelo_arbol2$variable.importance
+
+# Visualizar la importancia de las características
+print(importancia_caracteristicas2)
+
 predictors3 <- colnames(Datos_Tercer_Modelo)[-19]
 
 train.data3 <- Datos_Tercer_Modelo[sample.index3, c(predictors3, "Sex"), drop = FALSE]
@@ -229,7 +256,7 @@ knnPredict3 <- predict(knnFit3, newdata = test.data3)
 confusionMatrix(data = knnPredict3, reference = test.data3$Sex)
 
 #Remover 5 predictors
-Ret_5_Predicts3 <- c("Stroke", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "Education")
+Ret_5_Predicts3 <- c("Stroke", "CholCheck", "AnyHealthcare", "NoDocbcCost", "Smoker")
 train.data3_1 <- train.data3[, !(names(train.data3) %in% Ret_5_Predicts3)]
 test.data3_1 <- test.data3[, !(names(test.data3) %in% Ret_5_Predicts3)]
 
@@ -247,7 +274,7 @@ knnPredict3_1 <- predict(knnFit3_1, newdata = test.data3_1)
 confusionMatrix(data = knnPredict3_1, reference = test.data3_1$Sex)
 
 #Remover 5 predictores mas
-Ret_5_Predicts3_1 <- c("Age", "Fruits","CholCheck", "Veggies", "Income")
+Ret_5_Predicts3_1 <- c("Diabetes_012", "HighBP","HighChol", "HeartDiseaseorAttack", "MentHlth")
 train.data3_2 <- train.data3_1[, !(names(train.data3_1) %in% Ret_5_Predicts3_1)]
 test.data3_2 <- test.data3_1[, !(names(test.data3_1) %in% Ret_5_Predicts3_1)]
 
@@ -375,3 +402,8 @@ model_Rl_2 <- train(MentHlth ~ ., data = train.data_Rl_2, method = "lm",
                trControl = train.control_Rl_2)
 
 print(model_Rl_2)
+
+
+library(rpart)
+
+
