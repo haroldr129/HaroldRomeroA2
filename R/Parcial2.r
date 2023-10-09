@@ -192,10 +192,8 @@ knnFit2_2 <- train(HeartDiseaseorAttack ~ .
 
 plot(knnFit2_2)
 
-# Make predictions
 knnPredict2_2 <- predict(knnFit2_2, newdata = test.data2_2)
 
-# Creates the confusion matrix
 confusionMatrix(data = knnPredict2_2, reference = test.data2_2$HeartDiseaseorAttack)
 
 ###muestra estratificada del 1% de la población, variable clase Sex
@@ -226,10 +224,8 @@ knnFit3 <- train(Sex ~ .
                  , tuneLength = 50)
 
 
-# Make predictions
 knnPredict3 <- predict(knnFit3, newdata = test.data3)
 
-# Creates the confusion matrix
 confusionMatrix(data = knnPredict3, reference = test.data3$Sex)
 
 #Remover 5 predictors
@@ -264,10 +260,9 @@ knnFit3_2 <- train(Sex ~ .
 
 plot(knnFit3_2)
 
-# Make predictions
+
 knnPredict3_2 <- predict(knnFit3_2, newdata = test.data3_2)
 
-# Creates the confusion matrix
 confusionMatrix(data = knnPredict3_2, reference = test.data3_2$Sex)
 
 
@@ -288,10 +283,9 @@ train.control_Punto3 <- trainControl(method = "cv", number = 10 )
 model_Punto3 <- train(BMI ~ ., data = train.data_Punto3, method = "lm",
                trControl = train.control_Punto3)
 
-# Summarize the results
 print(model_Punto3)
 
-#### Segundo
+#### Segundo Punto del tercero
 
 Ret_5_Predicts_Punto3 <- c("Veggies", "HvyAlcoholConsump", "MentHlth", "Education", "Sex")
 
@@ -306,10 +300,9 @@ train.control_Punto3_1 <- trainControl(method = "cv", number = 5)
 model_Punto3_1 <- train(BMI ~ ., data = train.data_Punto3_1, method = "lm",
                trControl = train.control_Punto3_1)
 
-# Summarize the results
 print(model_Punto3_1)
 
-############## Tercero
+############## Tercero del tercero
 Ret_5_Predicts_Punto3_1 <- c("PhysHlth", "HighChol", "Income", "AnyHealthcare", "HeartDiseaseorAttack")
 
 train.data_Punto3_2 <- train.data_Punto3_1[, !(names(train.data_Punto3_1) %in% Ret_5_Predicts_Punto3_1)]
@@ -319,10 +312,11 @@ ins_model3 <- lm(BMI ~ ., data = train.data_Punto3_2)
 
 summary(ins_model3)
 
-# Train the model
+# Entrenar el modelo
 train.control_Punto3_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
 model_Punto3_2 <- train(BMI ~ ., data = train.data_Punto3_2, method = "lm",
                trControl = train.control_Punto3_2)
+
 # Summarize the results
 print(model_Punto3_2)
 
@@ -343,15 +337,13 @@ test.data_Rl <- Muestra2[-sample.index_Rl, c(predictors, "MentHlth"), drop = FAL
 ins_model_Rl <- lm(MentHlth ~ ., data = train.data_Rl)
 summary(ins_model_Rl)
 
-# Train the model
 train.control_Rl <- trainControl(method = "cv", number = 10 )
 model_Rl <- train(MentHlth ~ ., data = train.data_Rl, method = "lm",
                trControl = train.control_Rl)
 
-# Summarize the results
 print(model_Rl)
 
-###Second
+###Second, se retiran las variables que no aportan al modelo
 
 Pred_Remov__Rl <- c("Fruits", "BMI", "HeartDiseaseorAttack", "Veggies", "HvyAlcoholConsump")
 
@@ -361,15 +353,15 @@ test.data_Rl_1 <- test.data_Rl[, !(names(test.data_Rl) %in% Pred_Remov__Rl)]
 ins_model_Rl_1 <- lm(MentHlth ~ ., data = train.data_Rl_1)
 summary(ins_model_Rl_1)
 
-# Train the model
+
 train.control_Rl_1 <- trainControl(method = "cv", number = 5)
 model_Rl_1 <- train(MentHlth ~ ., data = train.data_Rl_1, method = "lm",
                trControl = train.control_Rl_1)
 
-# Summarize the results
+
 print(model_Rl_1)
 
-#### Third
+#### Third Se retiran las variables que no aportan al modelo
 Pred_Remov__Rl_1 <- c("CholCheck", "HighBP", "PhysActivity", "AnyHealtcare", "Education")
 
 train.data_Rl_2 <- train.data_Rl_1[, !(names(train.data_Rl_1) %in% Pred_Remov__Rl_1)]
@@ -378,9 +370,8 @@ test.data_Rl_2 <- test.data_Rl_1[, !(names(test.data_Rl_1) %in% Pred_Remov__Rl_1
 ins_model_Rl_2 <- lm(MentHlth ~ ., data = train.data_Rl_2)
 summary(ins_model_Rl_2)
 
-# Train the model
 train.control_Rl_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
 model_Rl_2 <- train(MentHlth ~ ., data = train.data_Rl_2, method = "lm",
                trControl = train.control_Rl_2)
-# Summarize the results
+
 print(model_Rl_2)
