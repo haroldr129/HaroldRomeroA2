@@ -271,3 +271,116 @@ knnPredict3_2 <- predict(knnFit3_2, newdata = test.data3_2)
 confusionMatrix(data = knnPredict3_2, reference = test.data3_2$Sex)
 
 
+########### TERCER PUNTO Y ULTIMO :)
+
+Predictors_Punto3 <- colnames(muestra)[-5]
+
+sample.index_1 <- sample(1:nrow(muestra)
+                       ,nrow(muestra)*0.7
+                       ,replace = F)
+train.data_Punto3 <- muestra[sample.index_1,c(Predictors_Punto3,"BMI"),drop=F]
+test.data_Punto3 <- muestra[-sample.index_1,c(Predictors_Punto3,"BMI"),drop=F]
+ins_model <- lm(BMI ~ ., data = train.data_Punto3)
+ins_model
+summary(ins_model)
+
+train.control_Punto3 <- trainControl(method = "cv", number = 10 )
+model_Punto3 <- train(BMI ~ ., data = train.data_Punto3, method = "lm",
+               trControl = train.control_Punto3)
+
+# Summarize the results
+print(model_Punto3)
+
+#### Segundo
+
+Ret_5_Predicts_Punto3 <- c("Veggies", "HvyAlcoholConsump", "MentHlth", "Education", "Sex")
+
+train.data_Punto3_1 <- train.data_Punto3[, !(names(train.data_Punto3) %in% Ret_5_Predicts_Punto3)]
+test.data_Punto3_1 <- test.data_Punto3[, !(names(test.data_Punto3) %in% Ret_5_Predicts_Punto3)]
+
+ins_model2 <- lm(BMI ~ ., data = train.data_Punto3_1)
+
+summary(ins_model2)
+
+train.control_Punto3_1 <- trainControl(method = "cv", number = 5)
+model_Punto3_1 <- train(BMI ~ ., data = train.data_Punto3_1, method = "lm",
+               trControl = train.control_Punto3_1)
+
+# Summarize the results
+print(model_Punto3_1)
+
+############## Tercero
+Ret_5_Predicts_Punto3_1 <- c("PhysHlth", "HighChol", "Income", "AnyHealthcare", "HeartDiseaseorAttack")
+
+train.data_Punto3_2 <- train.data_Punto3_1[, !(names(train.data_Punto3_1) %in% Ret_5_Predicts_Punto3_1)]
+test.data_Punto3_2 <- test.data_Punto3_1[, !(names(test.data_Punto3_1) %in% Ret_5_Predicts_Punto3_1)]
+
+ins_model3 <- lm(BMI ~ ., data = train.data_Punto3_2)
+
+summary(ins_model3)
+
+# Train the model
+train.control_Punto3_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+model_Punto3_2 <- train(BMI ~ ., data = train.data_Punto3_2, method = "lm",
+               trControl = train.control_Punto3_2)
+# Summarize the results
+print(model_Punto3_2)
+
+
+### Regresion linear
+
+set.seed(1)
+Muestra2 <- diabetes_012[sample(nrow(diabetes_012), 2536), ]
+
+predictors_Rl <- colnames(Muestra2)[-16]
+sample.index_Rl <- sample(1:nrow(Muestra2),
+                       nrow(Muestra2) * 0.7,
+                       replace = FALSE)
+
+train.data_Rl <- Muestra2[sample.index_Rl, c(predictors, "MentHlth"), drop = FALSE]
+test.data_Rl <- Muestra2[-sample.index_Rl, c(predictors, "MentHlth"), drop = FALSE]
+
+ins_model_Rl <- lm(MentHlth ~ ., data = train.data_Rl)
+summary(ins_model_Rl)
+
+# Train the model
+train.control_Rl <- trainControl(method = "cv", number = 10 )
+model_Rl <- train(MentHlth ~ ., data = train.data_Rl, method = "lm",
+               trControl = train.control_Rl)
+
+# Summarize the results
+print(model_Rl)
+
+###Second
+
+Pred_Remov__Rl <- c("Fruits", "BMI", "HeartDiseaseorAttack", "Veggies", "HvyAlcoholConsump")
+
+train.data_Rl_1 <- train.data_Rl[, !(names(train.data_Rl) %in% Pred_Remov__Rl)]
+test.data_Rl_1 <- test.data_Rl[, !(names(test.data_Rl) %in% Pred_Remov__Rl)]
+
+ins_model_Rl_1 <- lm(MentHlth ~ ., data = train.data_Rl_1)
+summary(ins_model_Rl_1)
+
+# Train the model
+train.control_Rl_1 <- trainControl(method = "cv", number = 5)
+model_Rl_1 <- train(MentHlth ~ ., data = train.data_Rl_1, method = "lm",
+               trControl = train.control_Rl_1)
+
+# Summarize the results
+print(model_Rl_1)
+
+#### Third
+Pred_Remov__Rl_1 <- c("CholCheck", "HighBP", "PhysActivity", "AnyHealtcare", "Education")
+
+train.data_Rl_2 <- train.data_Rl_1[, !(names(train.data_Rl_1) %in% Pred_Remov__Rl_1)]
+test.data_Rl_2 <- test.data_Rl_1[, !(names(test.data_Rl_1) %in% Pred_Remov__Rl_1)]
+
+ins_model_Rl_2 <- lm(MentHlth ~ ., data = train.data_Rl_2)
+summary(ins_model_Rl_2)
+
+# Train the model
+train.control_Rl_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+model_Rl_2 <- train(MentHlth ~ ., data = train.data_Rl_2, method = "lm",
+               trControl = train.control_Rl_2)
+# Summarize the results
+print(model_Rl_2)
