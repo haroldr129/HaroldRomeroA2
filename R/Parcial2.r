@@ -21,7 +21,8 @@ diabetes_012$Diabetes_012 <- ifelse(diabetes_012$Diabetes_012 == 0, 0, 1)
 set.seed(1)
 
 ### Tomar una muestra del dataset inicial, vamos a tomar el 1%
-muestra <- diabetes_012[sample(nrow(diabetes_012), 2536), ] #Muestre aleatorio simple
+muestra <-
+  diabetes_012[sample(nrow(diabetes_012), 2536), ] #Muestre aleatorio simple
 
 table(muestra$Sex)
 table(muestra$Smoker)
@@ -60,6 +61,8 @@ Datos_Primer_Modelo <- diabetes_012 %>%
   sample_n(1268, replace = TRUE) %>%
   ungroup()
 
+summary(Datos_Primer_Modelo)
+
 # Crear un modelo de árbol de decisión para determinar los datos mas relevantes
 modelo_arbol <- rpart(Diabetes_012 ~ ., data = Datos_Primer_Modelo)
 
@@ -74,41 +77,55 @@ sample.index1 <- sample(1:nrow(Datos_Primer_Modelo)
                        ,replace = F)
 
 
-predictors <- colnames(Datos_Primer_Modelo)[-1]
+predictors <-
+  colnames(Datos_Primer_Modelo)[-1]
 
-train.data1 <- Datos_Primer_Modelo[sample.index1, c(predictors, "Diabetes_012"), drop = FALSE]
-test.data1 <- Datos_Primer_Modelo[-sample.index1, c(predictors, "Diabetes_012"), drop = FALSE]
+train.data1 <-
+  Datos_Primer_Modelo[sample.index1, c(predictors, "Diabetes_012"), drop = FALSE] #cuales de las muestras fueron seleccionadas para el entrenamiento
+test.data1 <-
+  Datos_Primer_Modelo[-sample.index1, c(predictors, "Diabetes_012"), drop = FALSE] #Cuales de las muestras fueron seleccionadas para test
 
-train.data1$Diabetes_012 <- factor(train.data1$Diabetes_012)
-test.data1$Diabetes_012 <- factor(test.data1$Diabetes_012)
+####KNN
 
-ctrl1 <- trainControl(method = "cv", p = 0.7)
+train.data1$Diabetes_012 <-
+  factor(train.data1$Diabetes_012)
+test.data1$Diabetes_012 <-
+  factor(test.data1$Diabetes_012)
+
+ctrl1 <- trainControl(method = "cv", p = 0.7, number = 10) #Control del entrenamiento
 knnFit1 <- train(Diabetes_012 ~ .
                 , data = train.data1
                 , method = "knn", trControl = ctrl1
-                , preProcess = c("range") # c("center", "scale") for z-score
-                , tuneLength = 50)
+                , preProcess = c("center", "scale") #for z-score
+                , tuneLength = 50) #Permite hallar el K adecuado
 
+knnFit1
+plot(knnFit1)
 
 # Make predictions
-knnPredict1 <- predict(knnFit1, newdata = test.data1)
+knnPredict1 <- predict(knnFit1,
+                       newdata = test.data1)
+
+knnPredict1
 
 # Creates the confusion matrix
-confusionMatrix(data = knnPredict1, reference = test.data1$Diabetes_012)
+confusionMatrix(data = knnPredict1,
+                reference = test.data1$Diabetes_012)
 
 
 #Remover 5 predictors
-Ret_5_Predicts1 <- c("Smoker", " MentHlth", "AnyHealthcare", "NoDocbcCost", "Veggies")
+Ret_5_Predicts1 <- c("Smoker", "MentHlth", "AnyHealthcare", "NoDocbcCost", "Veggies")
 train.data1_1 <- train.data1[, !(names(train.data1) %in% Ret_5_Predicts1)]
 test.data1_1 <- test.data1[, !(names(test.data1) %in% Ret_5_Predicts1)]
 
-ctrl1_1 <- trainControl(method = "cv", number = 5)
+ctrl1_1 <- trainControl(method = "cv",p = 0.7, number = 5)
 knnFit1_1 <- train(Diabetes_012 ~ .
                  , data = train.data1_1
                  , method = "knn", trControl = ctrl1_1
-                 , preProcess = c("range") # c("center", "scale") for z-score
-                 , tuneLength = 20)
+                 , preProcess = c("center", "scale") # for z-score
+                 , tuneLength = 30)
 
+knnFit1_1
 plot(knnFit1_1)
 
 knnPredict1_1 <- predict(knnFit1_1, newdata = test.data1_1)
@@ -116,17 +133,18 @@ knnPredict1_1 <- predict(knnFit1_1, newdata = test.data1_1)
 confusionMatrix(data = knnPredict1_1, reference = test.data1_1$Diabetes_012)
 
 #Remover 5 predictores mas
-Ret_5_Predicts1_1 <- c("HvyAlcoholConsump ", "Fruits","Sex", "Stroke", "HighBP")
+Ret_5_Predicts1_1 <- c("HvyAlcoholConsump", "Fruits","Sex", "Stroke", "CholCheck")
 train.data1_2 <- train.data1_1[, !(names(train.data1_1) %in% Ret_5_Predicts1_1)]
 test.data1_2 <- test.data1_1[, !(names(test.data1_1) %in% Ret_5_Predicts1_1)]
 
-ctrl1_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+ctrl1_2 <- trainControl(method = "repeatedcv", p = 0.7, number = 10, repeats = 3)
 knnFit1_2 <- train(Diabetes_012 ~ .
                  , data = train.data1_2
                  , method = "knn", trControl = ctrl1_2
-                 , preProcess = c("range") # c("center", "scale") for z-score
-                 , tuneLength = 20)
+                 , preProcess = c("center", "scale") # for z-score
+                 , tuneLength = 30)
 
+knnFit1_2
 plot(knnFit1_2)
 
 # Make predictions
@@ -164,13 +182,15 @@ test.data2 <- Datos_Segundo_Modelo[-sample.index2, c(predictors2, "HeartDiseaseo
 train.data2$HeartDiseaseorAttack <- factor(train.data2$HeartDiseaseorAttack)
 test.data2$HeartDiseaseorAttack <- factor(test.data2$HeartDiseaseorAttack)
 
-ctrl2 <- trainControl(method = "cv", p = 0.7)
+ctrl2 <- trainControl(method = "cv", p = 0.7, number=10)
 knnFit2 <- train(HeartDiseaseorAttack ~ .
                  , data = train.data2
                  , method = "knn", trControl = ctrl2
-                 , preProcess = c("range") # c("center", "scale") for z-score
-                 , tuneLength = 50)
+                 , preProcess = c("center", "scale") # for z-score
+                 , tuneLength = 30)
 
+knnFit2
+plot(knnFit2)
 
 # Make predictions
 knnPredict2 <- predict(knnFit2, newdata = test.data2)
@@ -183,13 +203,13 @@ Ret_5_Predicts2 <- c("Sex", "HvyAlcoholConsump", "Fruits", "NoDocbcCost", "Veggi
 train.data2_1 <- train.data2[, !(names(train.data2) %in% Ret_5_Predicts2)]
 test.data2_1 <- test.data2[, !(names(test.data2) %in% Ret_5_Predicts2)]
 
-ctrl2_1 <- trainControl(method = "cv", number = 5)
+ctrl2_1 <- trainControl(method = "cv",p = 0.7, number = 5)
 knnFit2_1 <- train(HeartDiseaseorAttack ~ .
                    , data = train.data2_1
                    , method = "knn", trControl = ctrl2_1
-                   , preProcess = c("range") # c("center", "scale") for z-score
-                   , tuneLength = 20)
-
+                   , preProcess = c("center", "scale") # for z-score
+                   , tuneLength = 30)
+knnFit2_1
 plot(knnFit2_1)
 
 knnPredict2_1 <- predict(knnFit2_1, newdata = test.data2_1)
@@ -201,13 +221,13 @@ Ret_5_Predicts2_1 <- c("PhysActivity", "Diabetes_012","CholCheck", "AnyHealthcar
 train.data2_2 <- train.data2_1[, !(names(train.data2_1) %in% Ret_5_Predicts2_1)]
 test.data2_2 <- test.data2_1[, !(names(test.data2_1) %in% Ret_5_Predicts2_1)]
 
-ctrl2_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+ctrl2_2 <- trainControl(method = "repeatedcv", p = 0.7, number = 10, repeats = 3)
 knnFit2_2 <- train(HeartDiseaseorAttack ~ .
                    , data = train.data2_2
                    , method = "knn", trControl = ctrl2_2
                    , preProcess = c("range") # c("center", "scale") for z-score
-                   , tuneLength = 20)
-
+                   , tuneLength = 30)
+knnFit2_2
 plot(knnFit2_2)
 
 knnPredict2_2 <- predict(knnFit2_2, newdata = test.data2_2)
@@ -243,13 +263,15 @@ test.data3 <- Datos_Tercer_Modelo[-sample.index3, c(predictors3, "Sex"), drop = 
 train.data3$Sex <- factor(train.data3$Sex)
 test.data3$Sex <- factor(test.data3$Sex)
 
-ctrl3 <- trainControl(method = "cv", p = 0.7)
+ctrl3 <- trainControl(method = "cv", p = 0.7, number = 10)
 knnFit3 <- train(Sex ~ .
                  , data = train.data3
                  , method = "knn", trControl = ctrl3
-                 , preProcess = c("range") # c("center", "scale") for z-score
+                 , preProcess = c("center", "scale") # for z-score
                  , tuneLength = 50)
 
+knnFit3
+plot(knnFit3)
 
 knnPredict3 <- predict(knnFit3, newdata = test.data3)
 
@@ -260,13 +282,14 @@ Ret_5_Predicts3 <- c("Stroke", "CholCheck", "AnyHealthcare", "NoDocbcCost", "Smo
 train.data3_1 <- train.data3[, !(names(train.data3) %in% Ret_5_Predicts3)]
 test.data3_1 <- test.data3[, !(names(test.data3) %in% Ret_5_Predicts3)]
 
-ctrl3_1 <- trainControl(method = "cv", number = 5)
+ctrl3_1 <- trainControl(method = "cv",p = 0.7, number = 5)
 knnFit3_1 <- train(Sex ~ .
                    , data = train.data3_1
                    , method = "knn", trControl = ctrl3_1
-                   , preProcess = c("range") # c("center", "scale") for z-score
-                   , tuneLength = 20)
+                   , preProcess = c("center", "scale") # for z-score
+                   , tuneLength = 30)
 
+knnFit3_1
 plot(knnFit3_1)
 
 knnPredict3_1 <- predict(knnFit3_1, newdata = test.data3_1)
@@ -282,9 +305,9 @@ ctrl3_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
 knnFit3_2 <- train(Sex ~ .
                    , data = train.data3_2
                    , method = "knn", trControl = ctrl3_2
-                   , preProcess = c("range") # c("center", "scale") for z-score
-                   , tuneLength = 20)
-
+                   , preProcess = c("center", "scale") # for z-score
+                   , tuneLength = 30)
+knnFit3_2
 plot(knnFit3_2)
 
 
@@ -306,7 +329,7 @@ ins_model <- lm(BMI ~ ., data = train.data_Punto3)
 ins_model
 summary(ins_model)
 
-train.control_Punto3 <- trainControl(method = "cv", number = 10 )
+train.control_Punto3 <- trainControl(method = "cv", p = 0.7, number = 10 )
 model_Punto3 <- train(BMI ~ ., data = train.data_Punto3, method = "lm",
                trControl = train.control_Punto3)
 
@@ -314,7 +337,19 @@ print(model_Punto3)
 
 #### Segundo Punto del tercero
 
-Ret_5_Predicts_Punto3 <- c("Veggies", "HvyAlcoholConsump", "MentHlth", "Education", "Sex")
+Ret_5_Predicts_Punto3 <- c("Income"
+                           ,"Sex"
+                           ,"MentHlth"
+                           ,"AnyHealthcare"
+                           ,"HvyAlcoholConsump"
+                           ,"NoDocbcCost"
+                           ,"PhysHlth"
+                           ,"Education"
+                           ,"Veggies"
+                           ,"Fruits"
+                           ,"Smoker"
+                           ,"CholCheck"
+                           ,"HighChol")
 
 train.data_Punto3_1 <- train.data_Punto3[, !(names(train.data_Punto3) %in% Ret_5_Predicts_Punto3)]
 test.data_Punto3_1 <- test.data_Punto3[, !(names(test.data_Punto3) %in% Ret_5_Predicts_Punto3)]
@@ -323,14 +358,19 @@ ins_model2 <- lm(BMI ~ ., data = train.data_Punto3_1)
 
 summary(ins_model2)
 
-train.control_Punto3_1 <- trainControl(method = "cv", number = 5)
+train.control_Punto3_1 <- trainControl(method = "cv", p = 0.7, number = 5)
 model_Punto3_1 <- train(BMI ~ ., data = train.data_Punto3_1, method = "lm",
                trControl = train.control_Punto3_1)
 
 print(model_Punto3_1)
 
 ############## Tercero del tercero
-Ret_5_Predicts_Punto3_1 <- c("PhysHlth", "HighChol", "Income", "AnyHealthcare", "HeartDiseaseorAttack")
+Ret_5_Predicts_Punto3_1 <- c("Diabetes_012"
+                             , "Stroke"
+                             , "PhysActivity"
+                             , "GenHlth"
+                             , "DiffWalk"
+                             , "Age")
 
 train.data_Punto3_2 <- train.data_Punto3_1[, !(names(train.data_Punto3_1) %in% Ret_5_Predicts_Punto3_1)]
 test.data_Punto3_2 <- test.data_Punto3_1[, !(names(test.data_Punto3_1) %in% Ret_5_Predicts_Punto3_1)]
@@ -340,7 +380,7 @@ ins_model3 <- lm(BMI ~ ., data = train.data_Punto3_2)
 summary(ins_model3)
 
 # Entrenar el modelo
-train.control_Punto3_2 <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
+train.control_Punto3_2 <- trainControl(method = "repeatedcv", p = 0.7, number = 3, repeats = 10)
 model_Punto3_2 <- train(BMI ~ ., data = train.data_Punto3_2, method = "lm",
                trControl = train.control_Punto3_2)
 
