@@ -15,6 +15,10 @@ diabetes_012 <-
   read_csv(paste0(parentFolder
                   ,"/Data/diabetes_012_health_indicators.csv"))
 
+table(diabetes_012$Diabetes_012)
+head(diabetes_012) ##  Primeras observaciones o muestras del dataset
+summary(diabetes_012) ## Información estadistica del dataset
+
 ###### programación para que las personas que no tienen diabetes, queden en 0 y las personas
 ###### que tienen pre diabetes y diabetes, queden en 1
 diabetes_012$Diabetes_012 <- ifelse(diabetes_012$Diabetes_012 == 0, 0, 1)
@@ -25,14 +29,14 @@ set.seed(1)
 muestra <-
   diabetes_012[sample(nrow(diabetes_012), 2536), ] #Muestre aleatorio simple
 
-table(muestra$Sex)
-table(muestra$Smoker)
-table(muestra$CholCheck)
+table(diabetes_012$Diabetes_012)
+table(diabetes_012$Smoker)
+table(diabetes_012$CholCheck)
 
 ########## Exploración de los datos
 
-head(muestra) ##  Primeras observaciones o muestras del dataset
-summary(muestra) ## Información estadistica del dataset
+head(diabetes_012) ##  Primeras observaciones o muestras del dataset
+summary(diabetes_012) ## Información estadistica del dataset
 
 ##### Realizar histograma por cada variable con el fin de ver la cantidad de observaciones realizadas por cada rango
 ## y con esto podria indicar la probabilidad que existe que una nueva observación caiga en cada valor
@@ -77,7 +81,6 @@ print(importancia_caracteristicas)
 sample.index1 <- sample(1:nrow(Datos_Primer_Modelo)
                        ,nrow(Datos_Primer_Modelo)*0.7
                        ,replace = F)
-
 
 predictors <-
   colnames(Datos_Primer_Modelo)[-1]

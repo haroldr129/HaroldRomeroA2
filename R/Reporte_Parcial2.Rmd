@@ -1,0 +1,298 @@
+---
+title: "Reporte_Parcial2"
+author: "Harold Romero"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+Para el presente proyecto se usaran las siguientes librerias:
+
+```{r setup, message=FALSE}
+library (tidyverse)
+library(caret)
+library(class)
+library(gmodels)
+library(psych)
+library(dplyr)
+library(rpart)
+```
+
+En el presente documento se pretende desarrollar los puntos propuestos en el Parcial del Segundo Corte, Metodos supervisados en aprendizaje automatico kNN, regresión lineal y regresión multilineal
+
+Trabajaremos con el conjunto de datos **diabetes_012_health_indicators.csv** 
+
+Este conjunto de datos contiene las siguientes variables:
+
+* Diabetes_012: Describe la persona en que estado de Diabetes se encuentra
+  - 0 = No diabetes  - 1 = Prediabetes  - 2 = Diabetes
+
+* HighBP: 
+  - 0 = no high BP  - 1 = high BP 
+  
+* HighChol: 
+  - 0 = no high cholesterol   - 1 = high cholesterol 
+  
+* CholCheck: 
+  - 0 = no cholesterol check in 5 years  - 1 = yes cholesterol check in 5 years 
+  
+* BMI: Body Mass Index 
+
+* Smoker: Have you smoked at least 100 cigarettes in your entire life? [Note: 5 packs = 100 cigarettes] 
+  - 0 = no  - 1 =  yes 
+  
+* Stroke: (Ever told) you had a stroke. 
+  - 0 = no   - 1 = yes 
+  
+* HeartDiseaseorAttack: coronary heart disease (CHD) or myocardial infarction (MI) 
+  - 0 = no   - 1 = yes 
+  
+* PhysActivity: physical activity in past 30 days - not including job 
+  - 0 = no   - 1 = yes 
+
+* Fruits: Consume Fruit 1 or more times per day 
+  - 0 = no   - 1 = yes 
+
+* Veggies: Consume Vegetables 1 or more times per day 
+  - 0 = no   - 1 = yes 
+
+* HvyAlcoholConsump: (adult men >=14 drinks per week and adult women>=7 drinks per week) 
+  - 0 = no   - 1 = yes 
+
+* AnyHealthcare: Have any kind of health care coverage, including health insurance, prepaid plans such as HMO,  etc. 
+  - 0 = no   - 1 = yes
+
+* NoDocbcCost: Was there a time in the past 12 months when you needed to see a doctor but could not because  of cost? 
+  - 0 = no   - 1 = yes 
+
+* GenHlth: Would you say that in general your health is: scale 1-5 
+  - 1 = excellent  - 2 = very good   - 3 = good   - 4 = fair   - 5 =  poor 
+
+* MentHlth: days of poor mental health scale 1-30 days 
+
+* PhysHlth: physical illness or injury days in past 30 days scale 1-30 
+
+* DiffWalk: Do you have serious difficulty walking or climbing stairs? 
+  - 0 = no   - 1 = yes 
+
+* Sex: 
+  - 0 = female   - 1 = male 
+
+* Age: 13-level age category (_AGEG5YR see codebook) 
+  - 1 = 18-24   - 9 = 60-64   - 13 = 80 or older 
+
+* Education: Education level (EDUCA see codebook) scale 1-6 
+  - 1 = Never attended school or only kindergarten   - 2 =  elementary etc. 
+
+* Income: Income scale (INCOME2 see codebook) scale 1-8 
+  - 1 = less than $10,000   - 5 = less than $35,000   - 8 =  $75,000 or more
+
+# Cargar el Conjunto de Datos
+
+Para cargar el Conjunto de Datos en R, crearemos una carpeta llamada *Data* en la carpeta del proyecto, en su interior se guardara el archivo con extensión `.cvs`
+
+Posteriormente usaremos el siguiente comando para encontrar la carpeta padre
+
+
+```{r, message=FALSE}
+folder <- dirname(rstudioapi::getSourceEditorContext()$path)
+parentFolder <- dirname(folder)
+```
+
+Posteriormente se cargara el dataset con el siguiente comando, donde el conjunto de datos los llamaremos *diabetes_012*:
+
+```{r, message=FALSE}
+diabetes_012 <-
+  read_csv(paste0(parentFolder
+                  ,"/Data/diabetes_012_health_indicators.csv"))
+```
+
+# Analisis Exploratorio de Datos
+
+Los datos que se observan en el Conjunto de Datos son de Tipo Numerico, las variables se encuentran binarizados, a excepción de `Diabetes_012, BMI, GenHlth, MenHlth, MentHlth, PhysHlth, Age, Education e Income`
+
+Vemos las primeras observaciones del dataset asi:
+```{r}
+head(diabetes_012)
+```
+
+Este conjunto de datos tiene un numero total de observaciones de 253680, donde 213703 observaciones no tienen diabetes, 4631 tienen pre diabetes y 35346 tienen diabetes asi:
+
+```{r}
+table(diabetes_012$Diabetes_012)
+```
+
+Realizamos un resumen estadistico de las variables con el comando `summary` de nuestro dataset
+
+```{r}
+summary(diabetes_012)
+```
+
+Binarizamos la variable `Diabetes_012` donde tomaremos como 0 las observaciones No diabetes y como 1 las observaciones con pre diabetes y diabetes:
+
+```{r, message=FALSE}
+diabetes_012$Diabetes_012 <- ifelse(diabetes_012$Diabetes_012 == 0, 0, 1)
+```
+
+Realizamos el Histograma de las variables *Diabetes_012, BMI, GentHlth, Age, MentHlth, PhysHlth* con el fin de ver la cantidad de observaciones realizadas por cada rango y con esto poder indicar la probabilidad que existe que una nueva observacion caiga en cada valor
+
+```{r, include=FALSE}
+muestra <-
+  diabetes_012[sample(nrow(diabetes_012), 2536), ] #Muestre aleatorio simple
+```
+
+
+```{r pressure, echo=FALSE, error=FALSE}
+par(mfrow = c(2, 3))
+hist(muestra$Diabetes_012, breaks = 100, col = "red")
+hist(muestra$BMI, breaks = 100, col = "blue") # de acuerdo con el resultado podemos decir que tiene una distribución normal
+hist(muestra$GenHlth, breaks = 100, col = "green")
+hist(muestra$Age, breaks = 100, col = "yellow")
+hist(muestra$MentHlth, breaks = 100, col = "purple")
+hist(muestra$PhysHlth, breaks = 100, col = "pink")
+```
+
+Realizamos una correlación de los datos, poniendo en pares y en paneles con información de histogramas, variable clase Diabetes_012:
+
+```{r pairs, echo=FALSE, error=FALSE}
+pairs.panels(muestra [c("Age", "BMI", "HighChol", "GenHlth")],
+             pch = 21,
+             bg = c("purple", "black", "red", "orange" , "yellow")[unclass(muestra$Diabetes_012)])
+```
+
+
+# Parte 2 KNN
+
+A continuación de implementaran modelos predictivos utilizando el metodo KNN al considerar las variables como variables clase
+1. Diabetes_012 Versión Binaria
+2. HeartDiseaseorAttack 
+3. Sex
+
+## Crear versiones adecuadas del conjunto de datos
+
+Crearemos versiones adecuadas del conjunto de datos para cada modelo subdividiendo el conjunto de datos de modo que la variable clase esté equilibrada y corresponda al 1% del conjunto de datos, para ello realizaremos un muestreo estratificado:
+
+### Primer conjunto de datos para la variable Clase Diabetes_012 Version Binaria
+
+Llamaremos a nuestro primer conjunto de datos `Datos_Primer_Modelo` con variable clase `Diabetes_012` realizando un muestreo estratificado, asi:
+
+```{r, message=FALSE}
+set.seed(1)
+Datos_Primer_Modelo <- diabetes_012 %>%
+  group_by(Diabetes_012) %>%
+  sample_n(1268, replace = TRUE) %>%
+  ungroup()
+```
+
+Posteriormente sacaremos los valores estadisticos del nuevo conjunto de datos con el comando `summary(Datos_Primer_Modelo)`, obteniendo los siguientes datos:
+
+```{r}
+summary(Datos_Primer_Modelo)
+```
+
+Realizamos un modelo de arbol con el fin de identificar las variables mas significativas para predecir la variable clase, para ello usamos la función `rpart y variable importance` incluidas dentro de la libreria `library(rpart)`
+
+El resultado es:
+
+```{r, include=FALSE}
+# Crear un modelo de árbol de decisión para determinar los datos mas relevantes
+modelo_arbol <- rpart(Diabetes_012 ~ .
+                      , data = Datos_Primer_Modelo)
+
+# Calcular la importancia de las características
+importancia_caracteristicas <- modelo_arbol$variable.importance
+```
+
+```{r}
+print(importancia_caracteristicas)
+```
+
+Dividimos nuestro conjunto de datos en 70% para datos de entrenamiento y 30% para datos de prueba, posteriomente Vamos a tomar  como predictores a todos las variables que se encuentra en el conjunto de datos a excepción de nuestra variable clase `Diabetes_012`
+
+```{r}
+sample.index1 <- sample(1:nrow(Datos_Primer_Modelo)
+                       ,nrow(Datos_Primer_Modelo)*0.7
+                       ,replace = F)
+predictors <-
+  colnames(Datos_Primer_Modelo)[-1]
+
+train.data1 <-
+  Datos_Primer_Modelo[sample.index1
+                      , c(predictors, "Diabetes_012")
+                      , drop = FALSE] #muestras seleccionadas para el entrenamiento
+test.data1 <-
+  Datos_Primer_Modelo[-sample.index1
+                      , c(predictors
+                          , "Diabetes_012")
+                      , drop = FALSE] #muestras seleccionadas para test
+```
+
+Entrenamos nuestro modelo con crossvalidation 10 veces y con un tuneLenght de 50 con el fin de determinar el mejor K para nuestro modelo y un reprocesamiento z score
+
+Posterior al entrenamiento de nuestro modelo, hacemos una `confusionMatrix` con el fin de ver los resultados de nuestro modelo, donde se pueden observar los falsos positivos y los positivos positivos, asi mismo ver cual es el # de presición, la sensibilidad, especificidad y demas datos estadisticos que nos permiten determinar que tan confiable es nuestro modelo al ingresar un nuevo dato:
+
+```{r, include=FALSE}
+####KNN
+
+train.data1$Diabetes_012 <-
+  factor(train.data1$Diabetes_012)
+test.data1$Diabetes_012 <-
+  factor(test.data1$Diabetes_012)
+
+ctrl1 <- trainControl(method = "cv"
+                      , p = 0.7, number = 10) #Control del entrenamiento
+knnFit1 <- train(Diabetes_012 ~ .
+                , data = train.data1
+                , method = "knn", trControl = ctrl1
+                , preProcess = c("center", "scale") #for z-score
+                , tuneLength = 50) #Permite hallar el K adecuado
+
+knnFit1
+plot(knnFit1)
+
+# Make predictions
+knnPredict1 <- predict(knnFit1,
+                       newdata = test.data1)
+
+knnPredict1
+```
+
+```{r, echo=FALSE, error=FALSE }
+confusionMatrix(data = knnPredict1,
+                reference = test.data1$Diabetes_012)
+```
+
+
+Retiramos de nuestro modelo las variables predictoras que consideramos que no aportan a nuestro modelo de acuerdo con el modelo de arbol y al resultado de confusionMatrix, se eliminan las variables `"Smoker", "MentHlth", "AnyHealthcare", "NoDocbcCost", "Veggies"`, reentrenamos nuestro modelo con cross validation  5 Veces, con un preprocesamiento z score, con un rendimiento:
+
+```{r, include=FALSE}
+Ret_5_Predicts1 <- c("Smoker"
+                     , "MentHlth"
+                     , "AnyHealthcare"
+                     , "NoDocbcCost"
+                     , "Veggies")
+
+train.data1_1 <- train.data1[, !(names(train.data1) %in% Ret_5_Predicts1)]
+test.data1_1 <- test.data1[, !(names(test.data1) %in% Ret_5_Predicts1)]
+
+ctrl1_1 <- trainControl(method = "cv"
+                        ,p = 0.7, number = 5)
+
+knnFit1_1 <- train(Diabetes_012 ~ .
+                 , data = train.data1_1
+                 , method = "knn", trControl = ctrl1_1
+                 , preProcess = c("center", "scale") # for z-score
+                 , tuneLength = 30)
+
+knnFit1_1
+plot(knnFit1_1)
+
+knnPredict1_1 <- predict(knnFit1_1
+                         , newdata = test.data1_1)
+```
+
+```{r, echo=FALSE, error=FALSE }
+confusionMatrix(data = knnPredict1_1
+                , reference = test.data1_1$Diabetes_012)
+```
+
+Retiramos 5 Variables predictores que consideramos que no aportan a nuestro modelo, variables retiradas `"HvyAlcoholConsump","Fruits","Sex","Stroke","CholCheck"`Se prueba el rendimiento el modelo usando 3 validaciones cruzadas, con 10 repeticiones
